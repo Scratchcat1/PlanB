@@ -15,7 +15,7 @@ class Configuration_Store:
         
     def reset(self):
         self._default_share_directory = os.getcwd()
-        self._samba_server_ip = "127.0.0.1"
+        self._samba_server_identifier = "127.0.0.1"
         self._users = {}
         self._shares = {}
         self._backup_locations = {}
@@ -23,7 +23,7 @@ class Configuration_Store:
     def save_configuration(self, filename):
         configuration = {}
         configuration["default_share_directory"] = self._default_share_directory
-        configuration["samba_server_ip"] = self._samba_server_ip
+        configuration["samba_server_identifier"] = self._samba_server_identifier
         configuration["users"] = self._users
         configuration["shares"] = self._shares
         configuration["backup_locations"] = self._backup_locations
@@ -35,7 +35,7 @@ class Configuration_Store:
             with open(filename,"r") as file_handle:
                 configuration = json.load(file_handle)
             self._default_share_directory = configuration["default_share_directory"]
-            self._samba_server_ip = configuration["samba_server_ip"]
+            self._samba_server_identifier = configuration["samba_server_identifier"]
             self._users = configuration["users"]
             self._shares = configuration["shares"]
             self._backup_locations = configuration["backup_locations"]
@@ -46,10 +46,12 @@ class Configuration_Store:
         return self._default_share_directory
     def set_default_share_directory(self, directory):
         self._default_share_directory = directory
-    def get_samba_server_ip(self):
-        return self._samba_server_ip
-    def set_samba_server_ip(self, ip):
-        self._samba_server_ip = ip
+
+    def get_samba_server_identifier(self):
+        return self._samba_server_identifier
+
+    def set_samba_server_identifier(self, identifier):
+        self._samba_server_identifier = identifier
 
     #################################
     def add_user(self, username, password, master_password):

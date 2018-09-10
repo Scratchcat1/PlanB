@@ -3,7 +3,7 @@ import configuration_store
 import actions
 import defaults
 
-class Unknown:
+class App:
     def __init__(self, render):
         self._render = render
         self._config = configuration_store.Configuration_Store() 
@@ -28,7 +28,8 @@ class Unknown:
                                                "Backup location",
                                                "Set default share name",
                                                "Load configuration",
-                                               "Save configuration"
+                                               "Save configuration",
+                                               "Run backup"
                                             ])
         self._render.run(form)
         results = self._render.get_results()
@@ -45,6 +46,8 @@ class Unknown:
             self.load_configuration_dialog()
         elif results["option"] == 5:
             self.save_configuration_dialog()
+        elif results["option"] == 6:
+            self.run_backup_dialog()
 
     def users_menu_dialog(self):
         form = self.create_menu("Users", [
@@ -262,5 +265,18 @@ class Unknown:
             self._config,
             results["file_path"])        
 
-        
+    ######
+
+    def run_backup_dialog(self):
+        errors = actions.run_backup(self._config)
+
+        form = auto_ui.UI_Form()
+        form.set_title("Backup complete")
+        for dirs, hashes in errors.values():
+            form.add_description("Directory hash mismatch from source %s to target %s" % dirs)
+            form.add_description("  Hashes: Source: %s Target: %s" % hashes)
+
+        self._render.run(form)
+
+
 

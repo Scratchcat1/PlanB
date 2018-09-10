@@ -19,7 +19,7 @@ def get_ui_renderer(ui_mode):
 if __name__ == "__main__":
     not_exit = True
     renderer = get_ui_renderer(ui_mode)
-    unknown = auto_ui_dialog.Unknown(renderer)
+    unknown = auto_ui_dialog.App(renderer)
     while True:
         unknown.main_menu_dialog()
 

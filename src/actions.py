@@ -2,11 +2,7 @@ import configuration_store
 import sys_interaction
 import samba_cfg
 import os
-
-
-##class Enviroment:
-##    def __init__(config):
-##        config.reset()
+import defaults
 
 def reset(config):
     config = configuration_store.Configuration_Store()
@@ -62,3 +58,11 @@ def load_configuration(config, filename):
 def save_configuration(config, filename):
     config.save_configuration(filename)
 
+#########
+
+def run_backup(config)ackup_location_names():
+        backup_directory = config.get_backup_location(backup_location_name)["directory"]
+
+        if os.path.exists(backup_directory):
+            for share_name in mounted_shares:
+                source_dir = ms

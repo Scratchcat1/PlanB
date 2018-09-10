@@ -4,10 +4,8 @@ import shlex
 
 def add_share(share_name, directory_path, comment, acls, guest_ok = "n"):
     #acls - tuple in form (username,permission) where permission is "F","R" or "D"
-    #"F" = Full permission, "R" = read only, "D" - deny
-    #Guest_ok = "y" or "n"
-    print("sudo net usershare add %s \"%s\" \"%s\" %s guest_ok=%s" % (share_name, directory_path, comment, acls, guest_ok))
-    process = subprocess.Popen( shlex.split("sudo net usershare add %s %s \"%s\" %s guest_ok=%s" % (share_name, directory_path, comment, acls, guest_ok)))
+    # print("sudo net usershare add %s \"%s\" \"%s\" %s guest_ok=%s" % (share_name, directory_path, comment, acls, guest_ok))
+    process = subprocess.Popen( shlex.split("sudo net usershare add %s \"%s\" \"%s\" %s guest_ok=%s" % (share_name, directory_path, comment, acls, guest_ok)))
     output, error = process.communicate()
 
 def remove_share(share_name):
@@ -23,6 +21,23 @@ def mount_share(server_identifier, share_name, mount_directory, username, passwo
 def unmount_share(mount_directory):
     process = subprocess.Popen( shlex.split("sudo umount -f -l %s" % (mount_directory,)))
     output, error = process.communicate()
+
+def mount_all_shares(config):
+    mounted_shares = {}
+
+    for share_name in config.get_share_names():
+        share_dir = os.path.join("temp_mnt", share_name)
+        mount_share(config.get_samba_server_identifier(), share_name, share_dir, "BLANK", "BLANK")
+
+        if os.path.ismount(share_dir):
+            mounted_shares[share_name] = share_dir
+
+    return mounted_shares
+
+def unmount_all_shares(config):
+    for share_name in config.get_share_names():
+        share_dir = os.path.join("/mnt", "temp", share_name)
+        unmount_share(share_dir)
 
     
 
