@@ -14,7 +14,7 @@ class Configuration_Store:
         self.reset()
         
     def reset(self):
-        self._default_share_directory = os.getcwd()
+        self._private_share_directory = os.getcwd()
         self._samba_server_identifier = "127.0.0.1"
         self._users = {}
         self._shares = {}
@@ -22,7 +22,7 @@ class Configuration_Store:
 
     def save_configuration(self, filename):
         configuration = {}
-        configuration["default_share_directory"] = self._default_share_directory
+        configuration["private_share_directory"] = self._private_share_directory
         configuration["samba_server_identifier"] = self._samba_server_identifier
         configuration["users"] = self._users
         configuration["shares"] = self._shares
@@ -34,7 +34,7 @@ class Configuration_Store:
         try:
             with open(filename,"r") as file_handle:
                 configuration = json.load(file_handle)
-            self._default_share_directory = configuration["default_share_directory"]
+            self._private_share_directory = configuration["private_share_directory"]
             self._samba_server_identifier = configuration["samba_server_identifier"]
             self._users = configuration["users"]
             self._shares = configuration["shares"]
@@ -42,10 +42,10 @@ class Configuration_Store:
         except:
             print("Unable to load file %s. Keeping current state" % (filename,))
 
-    def get_default_share_directory(self):
-        return self._default_share_directory
-    def set_default_share_directory(self, directory):
-        self._default_share_directory = directory
+    def get_private_share_directory(self):
+        return self._private_share_directory
+    def set_private_share_directory(self, directory):
+        self._private_share_directory = directory
 
     def get_samba_server_identifier(self):
         return self._samba_server_identifier
@@ -105,7 +105,7 @@ class Configuration_Store:
     def add_backup_location(self, name, directory):
         # Name stores human readable identification of directory e.g. "Plan B External Drive"
         # directory must be mounted/available already
-        self._backup_locations[name]= {"directory":directory}
+        self._backup_locations[name]= {"directory": directory}
 
     def get_backup_location(self, name):
         self._backup_locations[name]

@@ -1,2 +1,3 @@
 CONFIG_DEFAULT_FILEPATH = "planb_config.json"
 VALIDATE_RSYNC_ENABLED = True
+MOUNT_POINT_PATH = "temp_mnt"

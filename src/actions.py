@@ -14,7 +14,7 @@ def add_user(config, username, password, add_private_share, master_password):
     config.add_user(username, password, master_password)
 
     if add_private_share:
-        directory = os.path.join(config.get_default_share_directory(), username)
+        directory = os.path.join(config.get_private_share_directory(), username)
         share_name = username + "_private_share"
         comment = username + "s private share"
         acls = username + ":f"
@@ -49,8 +49,8 @@ def remove_backup_location(config, name):
 
 #####
 
-def set_default_share_directory(config, directory):
-    config.set_default_share_directory(directory)
+def set_private_share_directory(config, directory):
+    config.set_private_share_directory(directory)
 
 def load_configuration(config, filename):
     config.load_configuration(filename)
@@ -60,9 +60,22 @@ def save_configuration(config, filename):
 
 #########
 
-def run_backup(config)ackup_location_names():
+def run_backup(config):
+    errors = {}
+    mounted_shares = samba_cfg.mount_all_shares(config)
+    for backup_location_name in config.get_backup_location_names():
         backup_directory = config.get_backup_location(backup_location_name)["directory"]
 
         if os.path.exists(backup_directory):
             for share_name in mounted_shares:
-                source_dir = ms
+                print("Copying from %s to %s" % (share_name, backup_location_name))
+                source_dir = mounted_shares[share_name]
+                error = sys_interaction.clone_directory(source_dir, backup_directory)
+
+                if error:
+                    errors[(source_dir, backup_directory)] = error
+    
+    samba_cfg.unmount_all_shares(config)
+    return errors
+
+                

@@ -41,7 +41,7 @@ class App:
         elif results["option"] == 2:
             self.backup_locations_menu_dialog()
         elif results["option"] == 3:
-            self.set_default_share_directory()
+            self.set_private_share_directory()
         elif results["option"] == 4:
             self.load_configuration_dialog()
         elif results["option"] == 5:
@@ -88,6 +88,7 @@ class App:
     def backup_locations_menu_dialog(self):
         form = self.create_menu("Backup locations", [
             "Add location",
+            "View backup location",
             "Remove location",
             ])
 
@@ -96,7 +97,9 @@ class App:
         
         if results["option"] == 0:
             self.add_backup_location_dialog()
-        elif results["option"] == 1:
+        if results["option"] == 1:
+            self.view_backup_locations_dialog()
+        elif results["option"] == 2:
             self.remove_backup_location_dialog()
 
     def add_user_dialog(self):
@@ -213,6 +216,8 @@ class App:
 
         for backup_location_name in self._config.get_backup_location_names():
             form.add_description(backup_location_name + ": " + str(self._config.get_backup_location(backup_location_name)))
+        
+        self._render.run(form)
 
     def remove_backup_location_dialog(self):
         form = auto_ui.UI_Form()
@@ -229,7 +234,7 @@ class App:
 
     ######
 
-    def set_default_share_directory(self):
+    def set_private_share_directory(self):
         form = auto_ui.UI_Form()
         form.set_title("Set default share directory")
         form.add_query("directory", "Directory")
@@ -237,7 +242,7 @@ class App:
         self._render.run(form)
         results = self._render.get_results()
         
-        actions.set_default_share_directory(
+        actions.set_private_share_directory(
             self._config,
             results["directory"])
 
@@ -272,9 +277,8 @@ class App:
 
         form = auto_ui.UI_Form()
         form.set_title("Backup complete")
-        for dirs, hashes in errors.values():
-            form.add_description("Directory hash mismatch from source %s to target %s" % dirs)
-            form.add_description("  Hashes: Source: %s Target: %s" % hashes)
+        for dirs, error in errors.values():
+            form.add_description("Error from source %s to target %s. Error: %s" % (dirs[0], dirs[1], error))
 
         self._render.run(form)
 

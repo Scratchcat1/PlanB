@@ -4,9 +4,7 @@ import shutil
 import shlex
 import checksumdir
 import defaults
-
-def display_title():
-    print("Welcome to Plan B")
+import utils
 
 def create_directory(main_directory_path, *directory_paths):
     #Creates a directory with the given directory path
@@ -31,30 +29,30 @@ def delete_directory(directory_path):
 
 def add_user(username, password):
     print("Adding user %s" % (username,))
-    process = subprocess.Popen( shlex.split("sudo useradd %s" % (username,)))
+    process = subprocess.Popen( shlex.split("sudo useradd %s" % (username,)), stderr = subprocess.PIPE)
+    utils.check_exception(process.communicate()[1])
+
     print("Attempting to set password for %s" % (username,))
-    process = subprocess.Popen( shlex.split(" sudo smbpasswd -a %s" % (username,)), stdin = subprocess.PIPE)
-    output, error = process.communicate((password+"\n"+password).encode())
+    process = subprocess.Popen( shlex.split(" sudo smbpasswd -a %s" % (username,)), stdin = subprocess.PIPE, stderr = subprocess.PIPE)
+    utils.check_exception(process.communicate((password+"\n"+password).encode()))
 
 def remove_user(username):
     print("Removing user %s" % (username,))
-    process = subprocess.Popen( shlex.split("sudo userdel %s" % (username,)))    
+    process = subprocess.Popen(shlex.split("sudo userdel %s" % (username,)), stderr = subprocess.PIPE)
+    utils.check_exception(process.communicate()[1])
 
 
 def rsync_directories(source, target):
-    process = subprocess.Popen(shlex.split("rsync -vz --delete %s %s" % (source, target)))
+    process = subprocess.Popen(shlex.split("rsync -vz --delete --info=progress2 %s %s" % (source, target)), stderr = subprocess.PIPE)
+    utils.check_exception(process.communicate()[1])
     
 def clone_directory(source_dir, target_dir):
     rsync_directories(source_dir, target_dir)
     if defaults.VALIDATE_RSYNC_ENABLED:
-        return validate_checksums(source_dir, target_dir)
-    else:
-        return False
+        validate_checksums(source_dir, target_dir)
 
 def validate_checksums(source_dir, target_dir):
     source_dir_hash = checksumdir.dirhash(source_dir)
     target_dir_hash = checksumdir.dirhash(target_dir)
     if source_dir_hash != target_dir_hash:
-        return (source_dir_hash, target_dir_hash)
-    else:
-        return False
+        raise Exception("Directory hash mismatch from source %s to target %s Hashes: Source: %s Target: %s" % (source_dir, target_dir, source_dir_hash, target_dir_hash))
