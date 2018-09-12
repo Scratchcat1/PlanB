@@ -1,8 +1,6 @@
 import auto_ui
 import auto_ui_dialog
 import tkinter 
-import auto_ui_dialog
-import configuration_store
 
 __version__ = "0.1.0"
 
@@ -17,7 +15,6 @@ def get_ui_renderer(ui_mode):
 
 
 if __name__ == "__main__":
-    not_exit = True
     renderer = get_ui_renderer(ui_mode)
     app = auto_ui_dialog.App(renderer)
     while True:

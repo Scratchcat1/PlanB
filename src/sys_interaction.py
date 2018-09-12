@@ -55,4 +55,4 @@ def validate_checksums(source_dir, target_dir):
     source_dir_hash = checksumdir.dirhash(source_dir)
     target_dir_hash = checksumdir.dirhash(target_dir)
     if source_dir_hash != target_dir_hash:
-        raise Exception("Directory hash mismatch from source %s to target %s Hashes: Source: %s Target: %s" % (source_dir, target_dir, source_dir_hash, target_dir_hash))
+        raise Warning("Directory hash mismatch from source %s to target %s Hashes: Source: %s Target: %s. This may be cause by different attribute values (timestamp etc.)." % (source_dir, target_dir, source_dir_hash, target_dir_hash))

@@ -273,14 +273,29 @@ class App:
     ######
 
     def run_backup_dialog(self):
-        errors = actions.run_backup(self._config)
-
         form = auto_ui.UI_Form()
-        form.set_title("Backup complete")
-        for dirs, error in errors.values():
-            form.add_description("Error from source %s to target %s. Error: %s" % (dirs[0], dirs[1], error))
+        form.set_title("Run backup")
+        form.add_query("master_password", "Enter master password")
 
         self._render.run(form)
+        results = self._render.get_results()
+
+
+        failed_shares, backup_locations_used = actions.run_backup(self._config, results["master_password"])
+
+        form = auto_ui.UI_Form()
+        form.set_title("Backup outcome")
+
+        form.add_description("Backup locations used:")
+        for backup_location in backup_locations_used:
+            form.add_description(backup_location)
+
+        form.add_description("Failed shares:")
+        for failed_share in failed_shares:
+            form.add_description(failed_share)
+        
+        self._render.run(form)
+
 
 
 

@@ -60,22 +60,23 @@ def save_configuration(config, filename):
 
 #########
 
-def run_backup(config):
-    errors = {}
-    mounted_shares = samba_cfg.mount_all_shares(config)
+def run_backup(config, master_password):
+    # Rsync all shares to each backup destination available. Ignore shares/destinations which cannot be mounted.
+    failed_shares = samba_cfg.mount_all_shares(config, master_password)
+    backup_locations_used = []
+
     for backup_location_name in config.get_backup_location_names():
         backup_directory = config.get_backup_location(backup_location_name)["directory"]
 
         if os.path.exists(backup_directory):
-            for share_name in mounted_shares:
+            backup_locations_used.append(backup_location_name)
+            for share_name in filter(lambda share_name : share_name not in failed_shares, config.get_share_names()):
+                
                 print("Copying from %s to %s" % (share_name, backup_location_name))
-                source_dir = mounted_shares[share_name]
-                error = sys_interaction.clone_directory(source_dir, backup_directory)
-
-                if error:
-                    errors[(source_dir, backup_directory)] = error
+                source_dir = samba_cfg.get_mount_point(share_name)
+                sys_interaction.clone_directory(source_dir, backup_directory)
     
     samba_cfg.unmount_all_shares(config)
-    return errors
+    return backup_locations_used, failed_shares
 
                 
